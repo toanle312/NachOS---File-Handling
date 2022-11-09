@@ -309,11 +309,42 @@ void Handle_SC_Close()
 		kernel->machine->WriteRegister(2, 0);
 	}
 	else if(result == -1) {
-		DEBUG(dbgSys, "File is not open");
+		DEBUG(dbgSys, "[Debug] File is not open");
 		kernel->machine->WriteRegister(2, -1);
 	}
 	UpdateProgramCounter();
 }
+
+void Handle_SC_Read() {
+	// Lấy giá trị tham số
+	int bufAddr = kernel->machine->ReadRegister(4);
+	int sizeBuf = kernel->machine->ReadRegister(5);
+	OpenFileId fileId = kernel->machine->ReadRegister(6);
+
+	// Kiểm tra OpenFileId có tồn tại không
+	bool isOpen = SysCheckOpenFileId(fileId);
+
+	// Nếu OpenFileId có tồn tại hay file đang mở thì đọc nội dung file
+	if (isOpen) {		
+		// Khởi tạo biến chuổi trong vùng Os
+		char *buffer = new char[sizeBuf];
+
+		// Đọc file với size tối đa
+		int numRead = kernel->fileSystem->openf[fileId]->Read(buffer,sizeBuf);
+
+		// Copy vào chuỗi vào vùng của User
+		CopyStringOSToUser(buffer,bufAddr);
+
+		// Giải phóng bộ nhớ đã cấp phát
+		delete buffer;
+
+		// Trả về giá trị
+		kernel->machine->WriteRegister(2, numRead);
+	}
+	// Đến lệnh tiếp theo
+	UpdateProgramCounter();
+}
+
 
 void Handle_SC_Halt()
 {
@@ -471,6 +502,9 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_Close:
 			return Handle_SC_Close();
+
+		case SC_Read:
+			return Handle_SC_Read();
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";
