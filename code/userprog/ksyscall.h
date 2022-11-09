@@ -320,15 +320,21 @@ int SysRadomNum()
 
 OpenFileId SysOpenFile(char* name)
 {
+  // check status of file
   OpenFile* opf = kernel->fileSystem->Open(name);
 
+  // file is open
   if(opf != NULL)
   {
+    // update status of file
+    // save status of file into openf to manage
     kernel->fileSystem->openf[0] = opf;
     return 0;
   }
+  // file is not open
   else
   {
+    // update status of file
     kernel->fileSystem->openf[0] = NULL;
     return -1;
   }
@@ -336,15 +342,21 @@ OpenFileId SysOpenFile(char* name)
 
 int SysCloseFile(OpenFileId id)
 {
+   // check status of file
   OpenFile* opf = kernel->fileSystem->openf[id];
+
+  // file is open
   if(opf != NULL && id != -1)
   {
+    // update status of file -> close file
     delete kernel->fileSystem->openf[id];
     kernel->fileSystem->openf[id] = NULL;
     return 0;
   }
+  // file is not open
   else
   {
+    // can not close file
     return -1;
   }
 }

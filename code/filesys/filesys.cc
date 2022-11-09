@@ -145,6 +145,7 @@ FileSystem::FileSystem(bool format)
         directoryFile = new OpenFile(DirectorySector);
     }
 
+    // Generate openf 
     openf = new OpenFile*;
 	*openf = NULL;
 }

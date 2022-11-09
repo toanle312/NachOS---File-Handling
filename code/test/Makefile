@@ -126,17 +126,17 @@ halt: halt.o start.o
 	$(LD) $(LDFLAGS) start.o halt.o -o halt.coff
 	$(COFF2NOFF) halt.coff halt
 
-add.o: add.c
-	$(CC) $(CFLAGS) -c add.c
-add: add.o start.o
-	$(LD) $(LDFLAGS) start.o add.o -o add.coff
-	$(COFF2NOFF) add.coff add
-
 openfile.o: openfile.c
 	$(CC) $(CFLAGS) -c openfile.c
 openfile: openfile.o start.o
 	$(LD) $(LDFLAGS) start.o openfile.o -o openfile.coff
 	$(COFF2NOFF) openfile.coff openfile
+
+add.o: add.c
+	$(CC) $(CFLAGS) -c add.c
+add: add.o start.o
+	$(LD) $(LDFLAGS) start.o add.o -o add.coff
+	$(COFF2NOFF) add.coff add
 
 ascii.o: ascii.c
 	$(CC) $(CFLAGS) -c ascii.c

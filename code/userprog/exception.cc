@@ -274,44 +274,66 @@ void Handle_SC_PrintChar()
 	UpdateProgramCounter();
 }
 
+/**
+ * @brief Process when System call Open is called
+ * @return void
+ */
 void Handle_SC_Open()
 {
+	// Take address of buffer file name
 	int buffAddr = kernel->machine->ReadRegister(4);
 
+	// convert user to OS
 	char *buffer = CopyStringUserToOS(buffAddr);
 
+	// Take OpenFileId of file 
 	OpenFileId result = SysOpenFile(buffer);
 
+	// Open succeed
 	if (result == 0)
 	{
-		DEBUG(dbgSys, "[Debug] Open file " << buffer << " at address " << kernel->fileSystem->openf[result] << " complete !!! \n");
+		DEBUG(dbgSys, "[Debug] Open file " << buffer << " complete !!! \n");
 		kernel->machine->WriteRegister(2, result);
 	}
+	// Open fail
 	else if(result == -1)
 	{
-		DEBUG(dbgSys, "[Debug] Can not open file " << buffer << " at address "<< kernel->fileSystem->openf[result] << "\n");
+		DEBUG(dbgSys, "[Debug] Can not open file " << buffer << "\n");
 		kernel->machine->WriteRegister(2, -1);
 	}
+
 	delete[] buffer;
 
 	UpdateProgramCounter();
 }
 
+/**
+ * @brief Process when System call Close is called
+ * @return void
+ */
 void Handle_SC_Close()
 {
+	// Take OpenFileId of file
 	int id = kernel->machine->ReadRegister(4);
+
+	// Save address file
 	OpenFile* fileAddr = kernel->fileSystem->openf[id];
 
+	// Take result of SysCloseFile process
 	int result = SysCloseFile(id);
+
+	// Close succeed
 	if (result == 0)
 	{
-		DEBUG(dbgSys, "[Debug] Closed file at address " << fileAddr << " !!! \n");
+		DEBUG(dbgSys, "[Debug] Closed file !!! \n");
 		kernel->machine->WriteRegister(2, 0);
 	}
+	// Close fail
 	else if(result == -1) {
-		DEBUG(dbgSys, "[Debug] File at address " << kernel->fileSystem->openf[id] <<" is not open !!! \n");
+		DEBUG(dbgSys, "[Debug] File at is not open !!! \n");
 		kernel->machine->WriteRegister(2, -1);
 	}
+
 	UpdateProgramCounter();
 }
 

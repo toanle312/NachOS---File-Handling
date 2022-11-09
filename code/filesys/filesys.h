@@ -42,8 +42,12 @@
 				// implementation is available
 class FileSystem {
   public:
+
+	// openf (OpenFile**) to save status of file (OpenFile*)
   	OpenFile** openf;
+
     FileSystem() {
+		// Generate openf 
 		openf = new OpenFile*;
 		*openf = NULL;
 		
@@ -74,6 +78,7 @@ class FileSystem {
 class FileSystem {
   public:
 
+	// openf (OpenFile**) to save status of file (OpenFile*)
 	OpenFile** openf;
 
     FileSystem(bool format);		// Initialize the file system.

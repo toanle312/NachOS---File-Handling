@@ -44,7 +44,6 @@
 #define SC_ReadChar     48
 #define SC_PrintChar    49
 
-
 #ifndef IN_ASM
 
 /* The system call interface.  These are the operations the Nachos
@@ -152,7 +151,7 @@ int Join(SpaceId id);
  * can be used to support these system calls if the regular Nachos
  * file system has not been implemented.
  */
-
+ 
 /* A unique identifier for an open Nachos file. */
 typedef int OpenFileId;	
 
