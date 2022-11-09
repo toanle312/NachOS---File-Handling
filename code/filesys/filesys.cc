@@ -145,8 +145,8 @@ FileSystem::FileSystem(bool format)
         directoryFile = new OpenFile(DirectorySector);
     }
 
-    openf = new OpenFile*[1];
-	openf[0] = NULL;
+    openf = new OpenFile*;
+	*openf = NULL;
 }
 
 //----------------------------------------------------------------------
@@ -236,6 +236,7 @@ OpenFile *
 FileSystem::Open(char *name)
 {
     Directory *directory = new Directory(NumDirEntries);
+    
     OpenFile *openFile = NULL;
     int sector;
 

@@ -321,6 +321,7 @@ int SysRadomNum()
 OpenFileId SysOpenFile(char* name)
 {
   OpenFile* opf = kernel->fileSystem->Open(name);
+
   if(opf != NULL)
   {
     kernel->fileSystem->openf[0] = opf;
@@ -338,8 +339,8 @@ int SysCloseFile(OpenFileId id)
   OpenFile* opf = kernel->fileSystem->openf[id];
   if(opf != NULL && id != -1)
   {
-    delete opf;
-    opf = NULL;
+    delete kernel->fileSystem->openf[id];
+    kernel->fileSystem->openf[id] = NULL;
     return 0;
   }
   else
