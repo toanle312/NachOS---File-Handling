@@ -7,6 +7,7 @@
 
 int main()
 {
+    
     int n = 0;
     int array[SIZE + 1];
     int check = 0;

@@ -42,7 +42,12 @@
 				// implementation is available
 class FileSystem {
   public:
-    FileSystem() {}
+  	OpenFile** openf;
+    FileSystem() {
+		openf = new OpenFile*[1];
+		openf[0] = NULL;
+		
+	}
 
     bool Create(char *name) {
 	int fileDescriptor = OpenForWrite(name);
@@ -61,11 +66,16 @@ class FileSystem {
 
     bool Remove(char *name) { return Unlink(name) == 0; }
 
+
+
 };
 
 #else // FILESYS
 class FileSystem {
   public:
+
+	OpenFile** openf;
+
     FileSystem(bool format);		// Initialize the file system.
 					// Must be called *after* "synchDisk" 
 					// has been initialized.

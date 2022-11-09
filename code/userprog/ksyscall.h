@@ -13,6 +13,8 @@
 
 #include "kernel.h"
 #include "synchconsole.h"
+#include "filesys.h"
+#include "syscall.h"
 
 #define LINE_FEED '\n'
 #define CARRIAGE_RETURN '\r'
@@ -315,5 +317,36 @@ int SysRadomNum()
 
   return result;
 }
+
+OpenFileId SysOpenFile(char* name)
+{
+  OpenFile* opf = kernel->fileSystem->Open(name);
+  if(opf != NULL)
+  {
+    kernel->fileSystem->openf[0] = opf;
+    return 0;
+  }
+  else
+  {
+    kernel->fileSystem->openf[0] = NULL;
+    return -1;
+  }
+}
+
+int SysCloseFile(OpenFileId id)
+{
+  OpenFile* opf = kernel->fileSystem->openf[id];
+  if(opf != NULL && id != -1)
+  {
+    delete opf;
+    opf = NULL;
+    return 0;
+  }
+  else
+  {
+    return -1;
+  }
+}
+
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */
