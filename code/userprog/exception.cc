@@ -284,13 +284,12 @@ void Handle_SC_Open()
 
 	if (result == 0)
 	{
-		DEBUG(dbgSys, kernel->fileSystem->openf[result]);
-		DEBUG(dbgSys, "[Debug] Open file " << buffer << " at address "<< kernel->fileSystem->openf[result] <<" complete !!! \n");
+		DEBUG(dbgSys, "[Debug] Open file " << buffer << " at address " << kernel->fileSystem->openf[result] << " complete !!! \n");
 		kernel->machine->WriteRegister(2, result);
 	}
 	else if(result == -1)
 	{
-		DEBUG(dbgSys, "[Debug] Can not open file " << buffer << "\n");
+		DEBUG(dbgSys, "[Debug] Can not open file " << buffer << " at address "<< kernel->fileSystem->openf[result] << "\n");
 		kernel->machine->WriteRegister(2, -1);
 	}
 	delete[] buffer;
@@ -301,15 +300,16 @@ void Handle_SC_Open()
 void Handle_SC_Close()
 {
 	int id = kernel->machine->ReadRegister(4);
+	OpenFile* fileAddr = kernel->fileSystem->openf[id];
 
 	int result = SysCloseFile(id);
 	if (result == 0)
 	{
-		DEBUG(dbgSys, "Closed file at address "<<kernel->fileSystem->openf[id]<<"\n");
+		DEBUG(dbgSys, "[Debug] Closed file at address " << fileAddr << " !!! \n");
 		kernel->machine->WriteRegister(2, 0);
 	}
 	else if(result == -1) {
-		DEBUG(dbgSys, "File is not open");
+		DEBUG(dbgSys, "[Debug] File at address " << kernel->fileSystem->openf[id] <<" is not open !!! \n");
 		kernel->machine->WriteRegister(2, -1);
 	}
 	UpdateProgramCounter();

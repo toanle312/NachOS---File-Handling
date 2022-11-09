@@ -44,8 +44,8 @@ class FileSystem {
   public:
   	OpenFile** openf;
     FileSystem() {
-		openf = new OpenFile*[1];
-		openf[0] = NULL;
+		openf = new OpenFile*;
+		*openf = NULL;
 		
 	}
 
