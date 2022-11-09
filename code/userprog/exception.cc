@@ -47,7 +47,6 @@ void UpdateProgramCounter()
 	kernel->machine->WriteRegister(NextPCReg, nextPCReg);
 }
 
-
 /**
  * @brief Copy system string to user string
  *
@@ -69,7 +68,6 @@ void CopyStringOSToUser(char *str, int addr, int copy_len = -1)
 	}
 	kernel->machine->WriteMem(addr + copy_len, 1, '\0');
 }
-
 
 /**
  * @brief Copy user string to system string
@@ -133,11 +131,11 @@ char *CopyStringUserToOS(int addr)
 	return str;
 }
 
-
 //----------------------------------------------------------------------
 // Handle System call Exceptions
 //----------------------------------------------------------------------
-void Handle_SC_Add() {
+void Handle_SC_Add()
+{
 	DEBUG(dbgSys, "Add " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
 
 	/* Process SysAdd Systemcall*/
@@ -146,7 +144,7 @@ void Handle_SC_Add() {
 					/* int op2 */ (int)kernel->machine->ReadRegister(5));
 
 	DEBUG(dbgSys, "Add returning with " << result << "\n");
-	
+
 	/* Prepare Result */
 	kernel->machine->WriteRegister(2, (int)result);
 
@@ -246,7 +244,6 @@ void Handle_SC_RandomNum()
 	UpdateProgramCounter();
 }
 
-
 /**
  * @brief Process when System call ReadChar is called
  * @return void
@@ -277,6 +274,46 @@ void Handle_SC_PrintChar()
 	UpdateProgramCounter();
 }
 
+void Handle_SC_Open()
+{
+	int buffAddr = kernel->machine->ReadRegister(4);
+
+	char *buffer = CopyStringUserToOS(buffAddr);
+
+	OpenFileId result = SysOpenFile(buffer);
+
+	if (result == 0)
+	{
+		DEBUG(dbgSys, "[Debug] Open file " << buffer << " at address " << kernel->fileSystem->openf[result] << " complete !!! \n");
+		kernel->machine->WriteRegister(2, result);
+	}
+	else if(result == -1)
+	{
+		DEBUG(dbgSys, "[Debug] Can not open file " << buffer << " at address "<< kernel->fileSystem->openf[result] << "\n");
+		kernel->machine->WriteRegister(2, -1);
+	}
+	delete[] buffer;
+
+	UpdateProgramCounter();
+}
+
+void Handle_SC_Close()
+{
+	int id = kernel->machine->ReadRegister(4);
+	OpenFile* fileAddr = kernel->fileSystem->openf[id];
+
+	int result = SysCloseFile(id);
+	if (result == 0)
+	{
+		DEBUG(dbgSys, "[Debug] Closed file at address " << fileAddr << " !!! \n");
+		kernel->machine->WriteRegister(2, 0);
+	}
+	else if(result == -1) {
+		DEBUG(dbgSys, "[Debug] File at address " << kernel->fileSystem->openf[id] <<" is not open !!! \n");
+		kernel->machine->WriteRegister(2, -1);
+	}
+	UpdateProgramCounter();
+}
 
 void Handle_SC_Halt()
 {
@@ -284,7 +321,6 @@ void Handle_SC_Halt()
 	SysHalt();
 	ASSERTNOTREACHED();
 }
-
 
 //----------------------------------------------------------------------
 // Handle Non System call Exceptions | User mode Exceptions
@@ -345,7 +381,6 @@ void Handle_NumExceptionTypes()
 	ASSERTNOTREACHED();
 }
 
-
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -377,7 +412,7 @@ void ExceptionHandler(ExceptionType which)
 
 	switch (which)
 	{
-	case NoException: 
+	case NoException:
 		return Handle_NoException();
 
 	case PageFaultException:
@@ -424,12 +459,18 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_RandomNum:
 			return Handle_SC_RandomNum();
-			
+
 		case SC_ReadChar:
 			return Handle_SC_ReadChar();
 
 		case SC_PrintChar:
 			return Handle_SC_PrintChar();
+
+		case SC_Open:
+			return Handle_SC_Open();
+
+		case SC_Close:
+			return Handle_SC_Close();
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";
