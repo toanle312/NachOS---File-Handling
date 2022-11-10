@@ -361,5 +361,13 @@ int SysCloseFile(OpenFileId id)
   }
 }
 
+bool SysCheckOpenFileId(OpenFileId id) {
+  OpenFile* opf = kernel->fileSystem->openf[id];
+  if (opf == nullptr) {
+    return false;
+  }
+  return true;
+}
+
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */
