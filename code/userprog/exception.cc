@@ -346,6 +346,15 @@ void Handle_SC_Seek()
 	int pos = kernel->machine->ReadRegister(4);
 	int id = kernel->machine->ReadRegister(5);
 
+	if(id == 0 || id == 1)
+	{
+		DEBUG(dbgSys, "Can not seek file in console !!!\n");
+		kernel->machine->WriteRegister(2, -1);
+		UpdateProgramCounter();
+		return;
+
+	}
+
 	int result = SysSeekFile(pos, id);
 
 	if(result != -1)
@@ -356,7 +365,7 @@ void Handle_SC_Seek()
 		DEBUG(dbgSys, "Seek file fail !!!\n");
 	}
 	
-	kernel->machine->ReadRegister(result);
+	kernel->machine->WriteRegister(2, result);
 
 	UpdateProgramCounter();
 }
