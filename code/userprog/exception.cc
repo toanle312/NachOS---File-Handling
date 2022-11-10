@@ -292,15 +292,22 @@ void Handle_SC_Open()
 	// Open succeed
 	if (result == 0)
 	{
-		DEBUG(dbgSys, "[Debug] Open file " << buffer << " complete !!! \n");
-		kernel->machine->WriteRegister(2, result);
+		DEBUG(dbgSys, "[Debug] stdin mode \n");
+	}
+	else if(result == 1)
+	{
+		DEBUG(dbgSys, "[Debug] stdout mode \n");
 	}
 	// Open fail
 	else if(result == -1)
 	{
 		DEBUG(dbgSys, "[Debug] Can not open file " << buffer << "\n");
-		kernel->machine->WriteRegister(2, -1);
 	}
+	else{
+		DEBUG(dbgSys, "[Debug] Open file " << buffer << " completed !!!\n");
+	}
+
+	kernel->machine->WriteRegister(2, result);
 
 	delete[] buffer;
 
@@ -316,9 +323,6 @@ void Handle_SC_Close()
 	// Take OpenFileId of file
 	int id = kernel->machine->ReadRegister(4);
 
-	// Save address file
-	OpenFile* fileAddr = kernel->fileSystem->openf[id];
-
 	// Take result of SysCloseFile process
 	int result = SysCloseFile(id);
 
@@ -326,13 +330,33 @@ void Handle_SC_Close()
 	if (result == 0)
 	{
 		DEBUG(dbgSys, "[Debug] Closed file !!! \n");
-		kernel->machine->WriteRegister(2, 0);
 	}
 	// Close fail
 	else if(result == -1) {
-		DEBUG(dbgSys, "[Debug] File at is not open !!! \n");
-		kernel->machine->WriteRegister(2, -1);
+		DEBUG(dbgSys, "[Debug] File at is not open !!! \n");	
 	}
+
+	kernel->machine->WriteRegister(2, result);
+
+	UpdateProgramCounter();
+}
+
+void Handle_SC_Seek()
+{
+	int pos = kernel->machine->ReadRegister(4);
+	int id = kernel->machine->ReadRegister(5);
+
+	int result = SysSeekFile(pos, id);
+
+	if(result != -1)
+	{
+		DEBUG(dbgSys, "Seek file completed !!!\n");
+	}
+	else{
+		DEBUG(dbgSys, "Seek file fail !!!\n");
+	}
+	
+	kernel->machine->ReadRegister(result);
 
 	UpdateProgramCounter();
 }
@@ -493,6 +517,9 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_Close:
 			return Handle_SC_Close();
+
+		case SC_Seek:
+			return Handle_SC_Seek();
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";

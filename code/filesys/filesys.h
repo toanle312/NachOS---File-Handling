@@ -45,12 +45,31 @@ class FileSystem {
 
 	// openf (OpenFile**) to save status of file (OpenFile*)
   	OpenFile** openf;
+	int index;
 
     FileSystem() {
 		// Generate openf 
-		openf = new OpenFile*;
-		*openf = NULL;
-		
+		openf = new OpenFile* [10];
+
+		index = 0;
+		for(int i = 0; i < 10; i++)
+		{
+			openf[i] = NULL;
+		}
+		this->Create("stdin");
+		this->Create("stdout");
+		openf[index++] = this->Open("stdin");
+		openf[index++] = this->Open("stdout");
+	}
+
+	//Destruction FileSystem
+	~FileSystem()
+	{
+		for (int i = 0; i < 10; ++i)
+		{
+			if (openf[i] != NULL) delete openf[i];
+		}
+		delete[] openf;
 	}
 
     bool Create(char *name) {
@@ -80,6 +99,7 @@ class FileSystem {
 
 	// openf (OpenFile**) to save status of file (OpenFile*)
 	OpenFile** openf;
+	int index;
 
     FileSystem(bool format);		// Initialize the file system.
 					// Must be called *after* "synchDisk" 
