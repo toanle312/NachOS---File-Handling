@@ -363,11 +363,8 @@ void Handle_SC_Close()
 	// Take OpenFileId of file
 	int id = kernel->machine->ReadRegister(4);
 
-<<<<<<< HEAD
-=======
 	// Save address file
 
->>>>>>> master
 	// Take result of SysCloseFile process
 	int result = SysCloseFile(id);
 
@@ -572,13 +569,11 @@ void ExceptionHandler(ExceptionType which)
 		case SC_Close:
 			return Handle_SC_Close();
 
-<<<<<<< HEAD
 		case SC_Seek:
 			return Handle_SC_Seek();
-=======
+			
 		case SC_Create:
 		return Handle_SC_Create();
->>>>>>> master
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";
