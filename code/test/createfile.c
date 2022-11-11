@@ -2,7 +2,7 @@
 
 int main()
 {
-    if (Create("test.txt") == -1)
+    if (Create("test1.txt") == -1)
     {
       PrintString("Can not create file test.txt\n");
     } else
