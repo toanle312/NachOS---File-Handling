@@ -306,7 +306,6 @@ void Handle_SC_Open()
 	else{
 		DEBUG(dbgSys, "[Debug] Open file " << buffer << " completed !!!\n");
 	}
-
 	kernel->machine->WriteRegister(2, result);
 
 	delete[] buffer;
