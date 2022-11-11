@@ -109,7 +109,6 @@ char *CopyStringUserToOS(int addr)
 	int len = 0;
 	bool stop = false;
 	char *str;
-
 	do
 	{
 		int oneChar;
@@ -412,6 +411,83 @@ void Handle_SC_Seek()
 	UpdateProgramCounter();
 }
 
+/*
+Input:
+	@bufAddr: User buffer address
+	@sizeBuf: User buffer size
+	@fileId: file Id to read
+Output:
+	@numRead: number characters have been read
+*/
+void Handle_SC_Read() {
+	// Get parameters value
+	int bufAddr = kernel->machine->ReadRegister(4);
+	int sizeBuf = kernel->machine->ReadRegister(5);
+	OpenFileId fileId = kernel->machine->ReadRegister(6);
+
+	// If file is opened
+	if (isOpen(fileId)) {
+		// Allocate Os buffer memory 
+		char* buffer = new char[sizeBuf];
+
+		// Read file and store in Os buffer
+		int numRead = kernel->fileSystem->openf[fileId]->Read(buffer, sizeBuf);
+
+		// copy string from Os buffer to User buf
+		CopyStringOSToUser(buffer, bufAddr, sizeBuf);
+
+		// deallocate Os buffer
+		delete[] buffer;
+
+		// Assign return value to register 2
+		kernel->machine->WriteRegister(numRead, 2);
+	} 
+	else {
+		// Assign return value to register 2
+		kernel->machine->WriteRegister(-1, 2);
+	}
+	// go to next instruction
+	UpdateProgramCounter();
+}
+
+
+/*
+Input:
+	@bufAddr: User buffer address
+	@sizeBuf: User buffer size
+	@fileId: file Id to write
+Output:
+	@numRead: number characters have been written
+*/
+void Handle_SC_Write() {
+	// Get parameters value
+	int bufAddr = kernel->machine->ReadRegister(4);
+	int sizeBuf = kernel->machine->ReadRegister(5);
+	OpenFileId fileId = kernel->machine->ReadRegister(6);
+
+	// If file is opened
+	if (isOpen(fileId)) {
+		// Allocate Os buffer memory
+		char* buffer = CopyStringUserToOS(bufAddr);
+
+		// Write buffer to file
+		int numWrite = kernel->fileSystem->openf[fileId]->Write(buffer, sizeBuf);
+
+		// deallocate Os buffer
+		delete[] buffer;
+
+		// Assign return value to register 2
+		kernel->machine->WriteRegister(numWrite, 2);
+	} 
+	else {
+		// Assign return value to register 2
+		kernel->machine->WriteRegister(-1, 2);
+	}
+	// go to next instruction
+	UpdateProgramCounter();
+}
+
+
 void Handle_SC_Halt()
 {
 	DEBUG(dbgSys, "[Debug] Shutdown, initiated by user program.\n");
@@ -573,7 +649,13 @@ void ExceptionHandler(ExceptionType which)
 			return Handle_SC_Seek();
 			
 		case SC_Create:
-		return Handle_SC_Create();
+			return Handle_SC_Create();
+
+		case SC_Read:
+			return Handle_SC_Read(); 
+
+		case SC_Write:
+			return Handle_SC_Write(); 
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";

@@ -407,8 +407,14 @@ int SysSeekFile(int position, OpenFileId id)
       return position;
     }
   }
+}
 
- 
+bool isOpen(OpenFileId id) {
+  OpenFile* opf = kernel->fileSystem->openf[id];
+  if (opf == NULL) {
+    return false;
+  }
+  return true;
 }
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */
