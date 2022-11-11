@@ -362,4 +362,29 @@ int SysCloseFile(OpenFileId id)
 }
 
 
+/** 
+ * @brief Remove file
+ * 
+ * @return int
+*/
+int SysRemoveFile(OpenFileId id, char* filename)
+{
+  // If is's not file
+  if (id == -1)
+  {
+    DEBUG(dbgSys, "[Debug] It's not a file");
+    return -1;
+  }
+  // If file is opening
+  OpenFile* opf = kernel->fileSystem->openf[id];
+  if (opf != NULL)
+  {
+    DEBUG(dbgSys, "[Debug] File is opening");
+    return -1;
+  }
+  //
+  result = kernel->filSystem->Remove(filename);
+  return 0;
+}
+
 #endif /* ! __USERPROG_KSYSCALL_H__ */
