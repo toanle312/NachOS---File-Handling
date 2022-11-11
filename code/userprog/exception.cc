@@ -275,6 +275,47 @@ void Handle_SC_PrintChar()
 }
 
 /**
+ * @brief Process when System call Create is called
+ * @return void
+*/
+void Handle_SC_Create()
+{
+	DEBUG(dbgSys, "[Debug] System call create");
+
+	// Take address of buffer file name
+	DEBUG(dbgSys, "[Debug] Reading address of file name");
+	int buffAddr = kernel->machine->ReadRegister(4);
+
+	// Convert user to OS
+	DEBUG(dbgSys, "[Debug] Reading file name");
+	char *buffer = CopyStringUserToOS(buffAddr);
+
+	if (buffer == NULL)
+	{
+		DEBUG(dbgSys, "[Debug] Not enough memory in system");
+		kernel->machine->WriteRegister(2, -1);
+	}
+	else
+	{
+		DEBUG(dbgSys, "[Debug] Finish reading file name");
+
+		if (!kernel->fileSystem->Create(buffer))
+		{
+			DEBUG(dbgSys, "[Debug] Can not create file");
+			kernel->machine->WriteRegister(2, -1);
+		}
+		else
+		{
+			DEBUG(dbgSys, "[Debug] Create file successfully");
+			kernel->machine->WriteRegister(2, 0);
+		}
+	}
+
+	delete[] buffer;	
+	UpdateProgramCounter();
+}
+
+/**
  * @brief Process when System call Open is called
  * @return void
  */
@@ -283,7 +324,7 @@ void Handle_SC_Open()
 	// Take address of buffer file name
 	int buffAddr = kernel->machine->ReadRegister(4);
 
-	// convert user to OS
+	// Convert user to OS
 	char *buffer = CopyStringUserToOS(buffAddr);
 
 	// Take OpenFileId of file 
@@ -322,6 +363,11 @@ void Handle_SC_Close()
 	// Take OpenFileId of file
 	int id = kernel->machine->ReadRegister(4);
 
+<<<<<<< HEAD
+=======
+	// Save address file
+
+>>>>>>> master
 	// Take result of SysCloseFile process
 	int result = SysCloseFile(id);
 
@@ -526,8 +572,13 @@ void ExceptionHandler(ExceptionType which)
 		case SC_Close:
 			return Handle_SC_Close();
 
+<<<<<<< HEAD
 		case SC_Seek:
 			return Handle_SC_Seek();
+=======
+		case SC_Create:
+		return Handle_SC_Create();
+>>>>>>> master
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";
