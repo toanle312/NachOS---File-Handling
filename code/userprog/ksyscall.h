@@ -15,6 +15,7 @@
 #include "synchconsole.h"
 #include "filesys.h"
 #include "syscall.h"
+#include "openfile.h"
 
 #define LINE_FEED '\n'
 #define CARRIAGE_RETURN '\r'
@@ -323,19 +324,36 @@ OpenFileId SysOpenFile(char* name)
   // check status of file
   OpenFile* opf = kernel->fileSystem->Open(name);
 
+  if(strcmp("stdin", name)==0)
+  {
+    return 0;
+  }
+
+  if(strcmp("stdout", name)==0)
+  {
+    return 1;
+  }
+  
+  OpenFileId id = kernel->fileSystem->index;
+
+  if(id < 0 || id > 10)
+  {
+    return -1;
+  }
+
   // file is open
   if(opf != NULL)
   {
     // update status of file
     // save status of file into openf to manage
-    kernel->fileSystem->openf[0] = opf;
-    return 0;
+    kernel->fileSystem->openf[id] = opf;
+    return id;
   }
   // file is not open
   else
   {
     // update status of file
-    kernel->fileSystem->openf[0] = NULL;
+    kernel->fileSystem->openf[id] = NULL;
     return -1;
   }
 }
@@ -346,7 +364,7 @@ int SysCloseFile(OpenFileId id)
   OpenFile* opf = kernel->fileSystem->openf[id];
 
   // file is open
-  if(opf != NULL && id != -1)
+  if(opf != NULL && id != -1) 
   {
     // update status of file -> close file
     delete kernel->fileSystem->openf[id];
@@ -361,5 +379,36 @@ int SysCloseFile(OpenFileId id)
   }
 }
 
+int SysSeekFile(int position, OpenFileId id)
+{
+  OpenFile* opf = kernel->fileSystem->openf[id];
+
+  if(id < 0 || id >10)
+  {
+    return -1;
+  }
+
+  if(opf == NULL)
+  {
+    //SysPrintString("Seek fail \n");
+    return -1;
+  }else{
+    if(position == -1)
+    {
+      position = kernel->fileSystem->openf[id]->Length();
+    }
+
+    if(position > kernel->fileSystem->openf[id]->Length() || position < 0)
+    {
+      return -1;
+    }
+    else{
+      kernel->fileSystem->openf[id]->Seek(position);
+      return position;
+    }
+  }
+
+ 
+}
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */

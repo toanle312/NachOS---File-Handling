@@ -2,7 +2,7 @@
 
 int main()
 {
-    OpenFileId open = Open("test.txt");
+    int open = Open("test.txt");
     Close(open);
 
     Halt();

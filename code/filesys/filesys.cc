@@ -146,8 +146,17 @@ FileSystem::FileSystem(bool format)
     }
 
     // Generate openf 
-    openf = new OpenFile*;
-	*openf = NULL;
+    openf = new OpenFile* [10];
+    index = 0;
+    for(int i = 0; i < 10; i++)
+    {
+        openf[i] = NULL;
+    }
+	this->Create("stdin",0);
+    this->Create("stdout",0);
+
+    openf[index++] = this->Open("stdin");
+    openf[index++] = this->Open("stdout");
 }
 
 //----------------------------------------------------------------------
