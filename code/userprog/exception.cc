@@ -457,6 +457,7 @@ void Handle_SC_Read() {
 
 
 /*
+Nguyễn Anh Tuấn - 20120395
 Input:
 	@bufAddr: User buffer address
 	@sizeBuf: User buffer size
