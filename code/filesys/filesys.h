@@ -117,6 +117,8 @@ class FileSystem {
 
     void List();			// List all the files in the file system
 
+		int IsOpen(char *name);		// Check file is open
+
     void Print();			// List all the files and their contents
 
   private:

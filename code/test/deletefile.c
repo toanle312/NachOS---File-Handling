@@ -2,8 +2,8 @@
 
 int main()
 {
-    Create("test1.txt");
-
+    Remove("test1.txt");
+      
     Halt();
     return 0;
 }

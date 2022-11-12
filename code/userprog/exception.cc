@@ -316,6 +316,38 @@ void Handle_SC_Create()
 }
 
 /**
+ * @brief Process when System call remove is called
+ * @return void
+ */
+void Handle_SC_Remove()
+{
+	// Take address of buffer file name
+	int buffAddr = kernel->machine->ReadRegister(4);
+
+	// Convert user to OS
+	char *buffer = CopyStringUserToOS(buffAddr);
+
+	int result = SysRemoveFile();
+
+	// Remove success
+	if (result == 0)
+	{
+		DEBUG(dbgSys, "[Debug] Remove file " << buffer << " completed !!!\n");
+	}
+	// Remove fail
+	else if(result == -1)
+	{
+		DEBUG(dbgSys, "[Debug] Can not remove file \n");
+	}
+
+	kernel->machine->WriteRegister(2, result);
+
+	delete[] buffer;
+
+	UpdateProgramCounter();
+}
+
+/**
  * @brief Process when System call Open is called
  * @return void
  */
@@ -573,7 +605,10 @@ void ExceptionHandler(ExceptionType which)
 			return Handle_SC_Seek();
 			
 		case SC_Create:
-		return Handle_SC_Create();
+			return Handle_SC_Create();
+
+		case SC_Remove:
+			return Handle_SC_Remove();
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";

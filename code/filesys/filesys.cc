@@ -262,6 +262,45 @@ FileSystem::Open(char *name)
 }
 
 //----------------------------------------------------------------------
+// FileSystem::IsOpen
+// 	Check the file is opening or is not file
+//	Return
+//	  -1: if is not file
+//     0: if is not opening
+//     1: if is opening
+//
+//	"name" -- the text name of the file to be opened
+//
+
+int IsOpen(char *name)
+{
+    Directory *directory = new Directory(NumDirEntries);
+    
+    OpenFile *openFile = NULL;
+    int sector;
+
+    directory->FetchFrom(directoryFile);
+    sector = directory->Find(name);
+    if (sector >= 0)
+    {
+        for(int i = 0; i < 10; i++)
+        {   // Is opening
+            if (openf[i] == sector)
+            {
+                DEBUG(dbgFile, "File" << name << "is opening");
+                return 1;
+            }
+            // is closing
+            return 0;
+        }
+    }
+
+    // Is not file
+    DEBUG(dbgFile, "Can not find file" << name);
+    return -1;
+}
+
+//----------------------------------------------------------------------
 // FileSystem::Remove
 // 	Delete a file from the file system.  This requires:
 //	    Remove it from the directory

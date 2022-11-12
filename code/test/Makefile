@@ -131,11 +131,18 @@ copy.o: copy.c
 copy: copy.o start.o
 	$(LD) $(LDFLAGS) start.o copy.o -o copy.coff
 	$(COFF2NOFF) copy.coff copy
+
 createfile.o: createfile.c
 	$(CC) $(CFLAGS) -c createfile.c
 createfile: createfile.o start.o
 	$(LD) $(LDFLAGS) start.o createfile.o -o createfile.coff
 	$(COFF2NOFF) createfile.coff createfile
+
+deletefile.o: deletefile.c
+	$(CC) $(CFLAGS) -c deletefile.c
+deletefile: deletefile.o start.o
+	$(LD) $(LDFLAGS) start.o deletefile.o -o deletefile.coff
+	$(COFF2NOFF) deletefile.coff deletefile
 
 openfile.o: openfile.c
 	$(CC) $(CFLAGS) -c openfile.c

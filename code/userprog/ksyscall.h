@@ -379,6 +379,18 @@ int SysCloseFile(OpenFileId id)
   }
 }
 
+int SysRemoveFile(char* name)
+{
+  int status = kernel->fileSystem->IsOpen(name);
+  if (status == 0)
+  {
+    int result = kernel->filSystem->Remove(filename);
+    return result;
+  } else {
+    return -1;
+  }
+}
+
 int SysSeekFile(int position, OpenFileId id)
 {
   OpenFile* opf = kernel->fileSystem->openf[id];
