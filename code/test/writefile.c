@@ -3,9 +3,10 @@
 
 
 int main() {
-    int fileId = Open("test.txt");
+    int fileId = Open("test1.txt");
     
-    Write("Hello world",13,fileId);
+    char* buff = "Hello world";
+    Write(buff,20,fileId);
 
     Close(fileId);
 

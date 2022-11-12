@@ -2,7 +2,7 @@
 
 int main()
 {
-    int open = Open("test.txt");
+    int open = Open("test1.txt");
     Close(open);
 
     Halt();

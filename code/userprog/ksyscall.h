@@ -417,4 +417,16 @@ bool isOpen(OpenFileId id) {
   return true;
 }
 
+
+int StringLength(char str[]) {
+  int len = 0;
+  char c;
+  do {
+    c = str[len++];
+    if (len == MAX_READ_STRING_LENGTH) {break;}
+  } while (c != '\0');
+
+  return --len;
+}
+
 #endif /* ! __USERPROG_KSYSCALL_H__ */

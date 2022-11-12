@@ -412,6 +412,7 @@ void Handle_SC_Seek()
 }
 
 /*
+Nguyễn Anh Tuấn - 20120395
 Input:
 	@bufAddr: User buffer address
 	@sizeBuf: User buffer size
@@ -426,7 +427,7 @@ void Handle_SC_Read() {
 	OpenFileId fileId = kernel->machine->ReadRegister(6);
 
 	// If file is opened
-	if (isOpen(fileId)) {
+	if (isOpen(fileId)) {		
 		// Allocate Os buffer memory 
 		char* buffer = new char[sizeBuf];
 
@@ -436,6 +437,8 @@ void Handle_SC_Read() {
 		// copy string from Os buffer to User buf
 		CopyStringOSToUser(buffer, bufAddr, sizeBuf);
 
+		DEBUG(dbgSys, "[Debug] Read a string '" << buffer << "' from file\n");
+
 		// deallocate Os buffer
 		delete[] buffer;
 
@@ -443,6 +446,8 @@ void Handle_SC_Read() {
 		kernel->machine->WriteRegister(numRead, 2);
 	} 
 	else {
+		DEBUG(dbgSys, "[Debug] Error read to unopened file !!!\n");
+
 		// Assign return value to register 2
 		kernel->machine->WriteRegister(-1, 2);
 	}
@@ -470,8 +475,12 @@ void Handle_SC_Write() {
 		// Allocate Os buffer memory
 		char* buffer = CopyStringUserToOS(bufAddr);
 
+		DEBUG(dbgSys, "[Debug] Write a string '" << buffer << "' to file\n");
+
+		int sizeWrite = StringLength(buffer);
+
 		// Write buffer to file
-		int numWrite = kernel->fileSystem->openf[fileId]->Write(buffer, sizeBuf);
+		int numWrite = kernel->fileSystem->openf[fileId]->Write(buffer, sizeWrite);
 
 		// deallocate Os buffer
 		delete[] buffer;
@@ -480,6 +489,8 @@ void Handle_SC_Write() {
 		kernel->machine->WriteRegister(numWrite, 2);
 	} 
 	else {
+		DEBUG(dbgSys, "[Debug] Error write to unopened file !!!\n");
+
 		// Assign return value to register 2
 		kernel->machine->WriteRegister(-1, 2);
 	}
