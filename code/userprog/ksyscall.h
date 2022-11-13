@@ -379,6 +379,42 @@ int SysCloseFile(OpenFileId id)
   }
 }
 
+/*
+Lê Thanh Tùng - 18120640
+Input:
+	@fileName: file name you want to remove
+Output:
+  1: remove file successed
+  0: remove file failed because the file is opening
+  -1: remove file failed because the file does not exist
+*/
+int SysRemoveFile(char* name){return -1;}
+// {
+//   bool isFileOpening = FALSE;
+
+//   // Check if file is opening
+//   for (int i = 0; i < 10; i++) {
+//     if(name == kernel->fileSystem->openf[i]->name) {
+//       isFileOpening = TRUE;
+//       break;
+//     }
+//   }
+//   // File is opening
+//   if (!isFileOpening)
+//   {
+//     // Remove file failed because the file is open
+//     return 0;
+//   }
+//   bool isRemove = kernel->fileSystem->Remove(name);
+
+//   if (isRemove) {
+//     // Remove file successed
+//     return 1;
+//   }
+//   // Remove file failed because the file does not exits
+//     return -1;
+// }
+
 int SysSeekFile(int position, OpenFileId id)
 {
   OpenFile* opf = kernel->fileSystem->openf[id];
@@ -412,9 +448,9 @@ int SysSeekFile(int position, OpenFileId id)
 bool isOpen(OpenFileId id) {
   OpenFile* opf = kernel->fileSystem->openf[id];
   if (opf == NULL) {
-    return false;
+    return FALSE;
   }
-  return true;
+  return TRUE;
 }
 
 

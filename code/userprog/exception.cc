@@ -315,6 +315,38 @@ void Handle_SC_Create()
 }
 
 /**
+ * @brief Process when System call remove is called
+ * @return void
+ */
+void Handle_SC_Remove()
+{
+	// Take address of buffer file name
+	int buffAddr = kernel->machine->ReadRegister(4);
+
+	// Convert user to OS
+	char *buffer = CopyStringUserToOS(buffAddr);
+
+	int result = SysRemoveFile(buffer);
+
+	// Remove success
+	if (result == 0)
+	{
+		DEBUG(dbgSys, "[Debug] Remove file " << buffer << " completed !!!\n");
+	}
+	// Remove fail
+	else if(result == -1)
+	{
+		DEBUG(dbgSys, "[Debug] Can not remove file \n");
+	}
+
+	kernel->machine->WriteRegister(2, result);
+
+	delete[] buffer;
+
+	UpdateProgramCounter();
+}
+
+/**
  * @brief Process when System call Open is called
  * @return void
  */
@@ -455,7 +487,6 @@ void Handle_SC_Read() {
 	UpdateProgramCounter();
 }
 
-
 /*
 Nguyễn Anh Tuấn - 20120395
 Input:
@@ -478,7 +509,8 @@ void Handle_SC_Write() {
 
 		DEBUG(dbgSys, "[Debug] Write a string '" << buffer << "' to file\n");
 
-		int sizeWrite = StringLength(buffer);
+		// calculate size of string to write
+		int sizeWrite = (sizeBuf > StringLength(buffer))?StringLength(buffer):sizeBuf;
 
 		// Write buffer to file
 		int numWrite = kernel->fileSystem->openf[fileId]->Write(buffer, sizeWrite);
@@ -668,6 +700,9 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_Write:
 			return Handle_SC_Write(); 
+
+		case SC_Remove:
+			return Handle_SC_Remove();
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";

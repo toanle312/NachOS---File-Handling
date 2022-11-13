@@ -25,7 +25,6 @@
 //
 //	"sector" -- the location on disk of the file header for this file
 //----------------------------------------------------------------------
-
 OpenFile::OpenFile(int sector)
 { 
     hdr = new FileHeader;

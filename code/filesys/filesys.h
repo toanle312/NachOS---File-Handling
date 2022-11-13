@@ -88,9 +88,6 @@ class FileSystem {
       }
 
     bool Remove(char *name) { return Unlink(name) == 0; }
-
-
-
 };
 
 #else // FILESYS
