@@ -10,7 +10,7 @@ Input:
 Output:
     modified file 1
 Purpose:
-    Copy data in file 2 to the EOF position of file 1
+    Copy all data in file 2 to the EOF position of file 1
 */
 int main() {
 
@@ -20,43 +20,57 @@ int main() {
     OpenFileId fileId2;
     char fileName2[MAX_STRING_LENGTH];
 
-    // Input file name
+    // Input name for file1
     PrintString("Nhap ten file nguon 1: ");
     ReadString(fileName1,MAX_STRING_LENGTH);
 
+    // Input name for file2
     PrintString("Nhap ten file nguon 2: ");
     ReadString(fileName2,MAX_STRING_LENGTH);
 
+    // Open file1
     fileId1 = Open(fileName1);
+
+    // Open file2
     fileId2 = Open(fileName2);
 
-    Seek(-1,fileId1);
+    // if both files are opened
+    if (fileId1 != -1 && fileId2 != -1) 
+    {
+        int isDone = 0;
+        char data[MAX_STRING_LENGTH];
 
-    // both files is open
-    if (fileId1 != -1 && fileId2 != -1) {
-        int run = 1;
-        char content[MAX_STRING_LENGTH];
+        // check number read bytes of data to check reach EOF, 
+        // if numRead < MAX_STRING_LENGTH mean it reach EOF file2
         int numRead = 0;
 
-        Seek(-1, fileId1);
+        // Seek to EOF position of file1
+        Seek(-1,fileId1);
 
-        do {
+        // Concatenate file
+        do 
+        {
             // Copy data from file 2
-            numRead = Read(content,MAX_STRING_LENGTH,fileId2);
+            numRead = Read(data,MAX_STRING_LENGTH,fileId2);
 
             // Write copied data of file2 to the end position of file1
-            Write(content,numRead,fileId1);
+            Write(data,numRead,fileId1);
 
-            // check if reach end of the file
+            // check if reach end of the file2
             if (numRead < MAX_STRING_LENGTH) {
-                run = 0;
+                isDone = 1;
             }
-        }while(run);
-    } else {
+        }while(!isDone);
+    } 
+    else // open file failed
+    {
         PrintString("[Error] file is not exist\n");
     }
-    Close(fileId2);
+    // Close file1
     Close(fileId1);
+
+    // Close file2
+    Close(fileId2);
 
     Halt();
 }

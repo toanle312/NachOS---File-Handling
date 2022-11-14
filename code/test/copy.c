@@ -1,20 +1,9 @@
 #include "syscall.h"
 
 #include"copyright.h"
+#define MAX_STRING_LENGTH 255
 
-int
-main(int argc, char *argv[])
+int main() 
 {
-    PrintNum(argc);
-
-    // if(argc != 5)
-    // {
-    //     PrintString("Wrong parmeter");
-    // }
-    // else{
-    //     PrintString(source);
-    //     PrintString(destination);
-    // }
-
-    return 0;
+    Halt();
 }
