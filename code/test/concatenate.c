@@ -21,11 +21,11 @@ int main() {
     char fileName2[MAX_STRING_LENGTH];
 
     // Input name for file1
-    PrintString("Nhap ten file nguon 1: ");
+    PrintString("Input source file: ");
     ReadString(fileName1,MAX_STRING_LENGTH);
 
     // Input name for file2
-    PrintString("Nhap ten file nguon 2: ");
+    PrintString("Input destination file: ");
     ReadString(fileName2,MAX_STRING_LENGTH);
 
     // Open file1
@@ -61,6 +61,7 @@ int main() {
                 isDone = 1;
             }
         }while(!isDone);
+        PrintString("Concatenate successed!!!\n");
     } 
     else // open file failed
     {

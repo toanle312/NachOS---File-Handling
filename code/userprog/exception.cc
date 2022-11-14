@@ -273,9 +273,14 @@ void Handle_SC_PrintChar()
 	UpdateProgramCounter();
 }
 
-/**
- * @brief Process when System call Create is called
- * @return void
+/*
+Le Thanh Tung - 18120640
+Input:
+	@bufAddr: file name
+Output:
+	@status: created status
+Purpose:
+	Create new file according file name
 */
 void Handle_SC_Create()
 {
@@ -285,7 +290,7 @@ void Handle_SC_Create()
 	DEBUG(dbgSys, "[Debug] Reading address of file name");
 	int buffAddr = kernel->machine->ReadRegister(4);
 
-	// Convert user to OS
+	// Convert user string buffer to OS string buffer
 	DEBUG(dbgSys, "[Debug] Reading file name");
 	char *buffer = CopyStringUserToOS(buffAddr);
 
@@ -306,10 +311,9 @@ void Handle_SC_Create()
 		else
 		{
 			DEBUG(dbgSys, "[Debug] Create file successfully");
-			kernel->machine->WriteRegister(2, 0);
+			kernel->machine->WriteRegister(2, 1);
 		}
 	}
-
 	delete[] buffer;	
 	UpdateProgramCounter();
 }
@@ -346,10 +350,15 @@ void Handle_SC_Remove()
 	UpdateProgramCounter();
 }
 
-/**
- * @brief Process when System call Open is called
- * @return void
- */
+/*
+Le Phuoc Toan - 20120386
+Input:
+	@bufAddr: file name
+Output:
+	@result: file Id
+Purpose:
+	Open file according file name
+*/
 void Handle_SC_Open()
 {
 	// Take address of buffer file name
@@ -382,19 +391,23 @@ void Handle_SC_Open()
 
 	delete[] buffer;
 
+	// Go to next instruction
 	UpdateProgramCounter();
 }
 
-/**
- * @brief Process when System call Close is called
- * @return void
- */
+/*
+Le Phuoc Toan - 20120386
+Input:
+	@id: file Id want to close
+Output:
+	@result: position 
+Purpose:
+	Close file with file id
+*/
 void Handle_SC_Close()
 {
 	// Take OpenFileId of file
 	int id = kernel->machine->ReadRegister(4);
-
-	// Save address file
 
 	// Take result of SysCloseFile process
 	int result = SysCloseFile(id);
@@ -409,36 +422,59 @@ void Handle_SC_Close()
 		DEBUG(dbgSys, "[Debug] File at is not open !!! \n");	
 	}
 
+	// Assign close status to register 2
 	kernel->machine->WriteRegister(2, result);
 
+	// go to next instruction
 	UpdateProgramCounter();
 }
 
+/*
+Le Phuoc Toan - 20120386
+Input:
+	@pos: position to seek
+	@id: file Id to seek
+Output:
+	@result: position 
+Purpose:
+	Setting new seeking position of file
+*/
 void Handle_SC_Seek()
 {
 	int pos = kernel->machine->ReadRegister(4);
 	int id = kernel->machine->ReadRegister(5);
 
+	// if file want to seek is stdout or stdin
 	if(id == 0 || id == 1)
 	{
 		DEBUG(dbgSys, "Can not seek file in console !!!\n");
+
+		// seeking failed
 		kernel->machine->WriteRegister(2, -1);
+
+		// go to next instruction
 		UpdateProgramCounter();
 		return;
 	}
 
+	// seeking position
 	int result = SysSeekFile(pos, id);
 
+	// seeking position is valid
 	if(result != -1)
 	{
 		DEBUG(dbgSys, "Seek file completed !!!\n");
 	}
-	else{
+	// seeking position is invalid
+	else
+	{
 		DEBUG(dbgSys, "Seek file fail !!!\n");
 	}
 	
+	// Assign seeking position to register 2
 	kernel->machine->WriteRegister(2, result);
 
+	// go to next instruction
 	UpdateProgramCounter();
 }
 
@@ -450,15 +486,29 @@ Input:
 	@fileId: file Id to read
 Output:
 	@numRead: number characters have been read
+Purpose:
+	Reading file data to bufAddr according file id
 */
-void Handle_SC_Read() {
+void Handle_SC_Read() 
+{
 	// Get parameters value
 	int bufAddr = kernel->machine->ReadRegister(4);
 	int sizeBuf = kernel->machine->ReadRegister(5);
 	OpenFileId fileId = kernel->machine->ReadRegister(6);
 
 	// If file is opened
-	if (isOpen(fileId)) {		
+	if (isOpen(fileId)) 
+	{		
+		// if writing std file
+		if (fileId == 0) 
+		{
+			DEBUG(dbgSys, "[Debug] Reading file stdin\n");
+		}
+		if (fileId == 1) 
+		{
+			DEBUG(dbgSys, "[Debug] Reading file stdout\n");
+		}
+
 		// Allocate Os buffer memory 
 		char* buffer = new char[sizeBuf];
 		
@@ -479,10 +529,11 @@ void Handle_SC_Read() {
 		// deallocate Os buffer
 		delete[] buffer;
 
-		// Assign return value to register 2
+		// Assign number of read bytes to register 2
 		kernel->machine->WriteRegister(2, numRead);
 	} 
-	else {
+	else 
+	{
 		DEBUG(dbgSys, "[Debug] Error read to unopened file !!!\n");
 
 		// Assign return value to register 2
@@ -500,15 +551,28 @@ Input:
 	@fileId: file Id to write
 Output:
 	@numRead: number characters have been written
+Purpose:
+	Writting file with bufAddr according file id
 */
-void Handle_SC_Write() {
+void Handle_SC_Write() 
+{
 	// Get parameters value
 	int bufAddr = kernel->machine->ReadRegister(4);
 	int sizeBuf = kernel->machine->ReadRegister(5);
 	OpenFileId fileId = kernel->machine->ReadRegister(6);
 
 	// If file is opened
-	if (isOpen(fileId)) {
+	if (isOpen(fileId)) 
+	{
+		// if writing std file
+		if (fileId == 0 || fileId == 1) 
+		{
+			DEBUG(dbgSys, "[Debug] Can not write std file\n");
+			kernel->machine->WriteRegister(2, -1);
+			UpdateProgramCounter();
+			return;
+		}
+
 		OpenFile* opf = kernel->fileSystem->openf[fileId];
 
 		// Allocate Os buffer memory
@@ -525,10 +589,11 @@ void Handle_SC_Write() {
 		// deallocate Os buffer
 		delete[] buffer;
 
-		// Assign return value to register 2
+		// Assign number of bytes written to register 2
 		kernel->machine->WriteRegister(2, numWrite);
 	} 
-	else {
+	else 
+	{
 		DEBUG(dbgSys, "[Debug] Error write to unopened file !!!\n");
 
 		// Assign return value to register 2

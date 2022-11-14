@@ -278,12 +278,12 @@ char* SysReadString(int length) {
     int i = 0;
     do {
       oneChar = SysReadChar();
-      if (oneChar == '\n') {
+      if (oneChar == '\n' || i == length || i == MAX_READ_STRING_LENGTH) {
         break;
       }
       buffer[i++] = oneChar;
     } while (true);
-    buffer[length-1] = '\0';
+    buffer[i] = '\0';
     return buffer;
 }
 

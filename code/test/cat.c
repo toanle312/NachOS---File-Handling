@@ -17,7 +17,7 @@ int main() {
     char fileName[MAX_STRING_LENGTH];
 
     // Input file name
-    PrintString("Nhap ten file: ");
+    PrintString("Input file name: ");
     ReadString(fileName,MAX_STRING_LENGTH);
 
     // Open file
