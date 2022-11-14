@@ -302,7 +302,7 @@ void Handle_SC_Create()
 	else
 	{
 		DEBUG(dbgSys, "[Debug] Finish reading file name");
-
+		
 		if (!kernel->fileSystem->Create(buffer))
 		{
 			DEBUG(dbgSys, "[Debug] Can not create file");

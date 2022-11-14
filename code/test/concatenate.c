@@ -61,7 +61,7 @@ int main() {
                 isDone = 1;
             }
         }while(!isDone);
-        PrintString("Concatenate successed!!!\n");
+        PrintString("Concatenate succeed!!!\n");
     } 
     else // open file failed
     {
