@@ -2,7 +2,7 @@
 
 int main()
 {
-    Create("test1.txt");
+    Create("test2.txt");
 
     Halt();
     return 0;

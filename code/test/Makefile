@@ -132,7 +132,6 @@ copy: copy.o start.o
 	$(LD) $(LDFLAGS) start.o copy.o -o copy.coff
 	$(COFF2NOFF) copy.coff copy
 
-// Project 2 --------------------------------------------------
 concatenate.o: concatenate.c
 	$(CC) $(CFLAGS) -c concatenate.c
 concatenate: concatenate.o start.o
@@ -169,7 +168,6 @@ openfile: openfile.o start.o
 	$(LD) $(LDFLAGS) start.o openfile.o -o openfile.coff
 	$(COFF2NOFF) openfile.coff openfile
 
-// ----------------------------------------------------------
 
 add.o: add.c
 	$(CC) $(CFLAGS) -c add.c

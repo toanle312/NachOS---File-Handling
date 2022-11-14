@@ -42,7 +42,7 @@ int main() {
             numRead = Read(content,MAX_STRING_LENGTH,fileId2);
 
             // Write content from file2 to end of file1
-            Write(content,fileId1);
+            Write(content,MAX_STRING_LENGTH,fileId1);
 
             // check if reach end of the file
             if (numRead < MAX_STRING_LENGTH) {

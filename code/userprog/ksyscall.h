@@ -431,7 +431,7 @@ int SysSeekFile(int position, OpenFileId id)
   }else{
     if(position == -1)
     {
-      position = kernel->fileSystem->openf[id]->Length();
+      position = kernel->fileSystem->openf[id]->Length()-1;
     }
 
     if(position > kernel->fileSystem->openf[id]->Length() || position < 0)
