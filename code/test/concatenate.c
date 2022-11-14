@@ -6,11 +6,11 @@
 Nguyen Anh Tuan - 20120395
 Input:
 	@fileName1  source file 1
-    @fileName2  source file 2
+    @fileName2  destination file 2
 Output:
-    modified file 1
+    modified file 2
 Purpose:
-    Copy all data in file 2 to the EOF position of file 1
+    Copy all data in file 1 to the EOF position of file 2
 */
 int main() {
 
@@ -44,17 +44,17 @@ int main() {
         // if numRead < MAX_STRING_LENGTH mean it reach EOF file2
         int numRead = 0;
 
-        // Seek to EOF position of file1
-        Seek(-1,fileId1);
+        // Seek to EOF position of file2
+        Seek(-1,fileId2);
 
         // Concatenate file
         do 
         {
             // Copy data from file 2
-            numRead = Read(data,MAX_STRING_LENGTH,fileId2);
+            numRead = Read(data,MAX_STRING_LENGTH,fileId1);
 
             // Write copied data of file2 to the end position of file1
-            Write(data,numRead,fileId1);
+            Write(data,numRead,fileId2);
 
             // check if reach end of the file2
             if (numRead < MAX_STRING_LENGTH) {
