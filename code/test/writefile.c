@@ -5,7 +5,7 @@
 int main() {
     int fileId = Open("test2.txt");
     
-    char* buff = "This is beautiful.";
+    char* buff = "This is beautiful";
     char buf[25];
     Write(buff,20,fileId);
 

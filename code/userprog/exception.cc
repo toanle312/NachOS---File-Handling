@@ -425,7 +425,6 @@ void Handle_SC_Seek()
 		kernel->machine->WriteRegister(2, -1);
 		UpdateProgramCounter();
 		return;
-
 	}
 
 	int result = SysSeekFile(pos, id);
@@ -462,33 +461,39 @@ void Handle_SC_Read() {
 	if (isOpen(fileId)) {		
 		// Allocate Os buffer memory 
 		char* buffer = new char[sizeBuf];
+		
+		OpenFile* opf = kernel->fileSystem->openf[fileId];
 
-		// Read file and store in Os buffer
-		int numRead = kernel->fileSystem->openf[fileId]->Read(buffer, sizeBuf);
+		DEBUG(dbgSys, "[Debug] File length " << opf->Length() <<  "\n");
 
-		// copy string from Os buffer to User buf
-		CopyStringOSToUser(buffer, bufAddr, sizeBuf);
+		// Read file and store in OS buffer
+		int numRead = opf->Read(buffer, sizeBuf);
 
-		DEBUG(dbgSys, "[Debug] Read a string '" << buffer << "' from file\n");
+		DEBUG(dbgSys, "[Debug] Number bytes is read: " << numRead << "' from fileId " << fileId << "\n");
+
+		// copy string from OS buffer to User buf
+		CopyStringOSToUser(buffer, bufAddr);
+
+		DEBUG(dbgSys, "[Debug] Read a string '" << buffer << "' from fileId " << fileId << "\n");
 
 		// deallocate Os buffer
 		delete[] buffer;
 
 		// Assign return value to register 2
-		kernel->machine->WriteRegister(numRead, 2);
+		kernel->machine->WriteRegister(2, numRead);
 	} 
 	else {
 		DEBUG(dbgSys, "[Debug] Error read to unopened file !!!\n");
 
 		// Assign return value to register 2
-		kernel->machine->WriteRegister(-1, 2);
+		kernel->machine->WriteRegister(2, -1);
 	}
 	// go to next instruction
 	UpdateProgramCounter();
 }
 
 /*
-Nguyễn Anh Tuấn - 20120395
+Nguyen Anh Tuan - 20120395
 Input:
 	@bufAddr: User buffer address
 	@sizeBuf: User buffer size
@@ -504,28 +509,30 @@ void Handle_SC_Write() {
 
 	// If file is opened
 	if (isOpen(fileId)) {
+		OpenFile* opf = kernel->fileSystem->openf[fileId];
+
 		// Allocate Os buffer memory
 		char* buffer = CopyStringUserToOS(bufAddr);
 
-		DEBUG(dbgSys, "[Debug] Write a string '" << buffer << "' to file\n");
+		DEBUG(dbgSys, "[Debug] Write a string '" << buffer << "' to fileId " << fileId << "\n");
 
 		// calculate size of string to write
 		int sizeWrite = (sizeBuf > StringLength(buffer))?StringLength(buffer):sizeBuf;
 
 		// Write buffer to file
-		int numWrite = kernel->fileSystem->openf[fileId]->Write(buffer, sizeWrite);
+		int numWrite = opf->Write(buffer, sizeWrite);
 
 		// deallocate Os buffer
 		delete[] buffer;
 
 		// Assign return value to register 2
-		kernel->machine->WriteRegister(numWrite, 2);
+		kernel->machine->WriteRegister(2, numWrite);
 	} 
 	else {
 		DEBUG(dbgSys, "[Debug] Error write to unopened file !!!\n");
 
 		// Assign return value to register 2
-		kernel->machine->WriteRegister(-1, 2);
+		kernel->machine->WriteRegister(2, -1);
 	}
 	// go to next instruction
 	UpdateProgramCounter();

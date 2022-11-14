@@ -346,6 +346,7 @@ OpenFileId SysOpenFile(char* name)
   {
     // update status of file
     // save status of file into openf to manage
+    kernel->fileSystem->index++;
     kernel->fileSystem->openf[id] = opf;
     return id;
   }
@@ -380,7 +381,7 @@ int SysCloseFile(OpenFileId id)
 }
 
 /*
-Lê Thanh Tùng - 18120640
+Le Thanh Tung - 18120640
 Input:
 	@fileName: file name you want to remove
 Output:
@@ -415,45 +416,70 @@ int SysRemoveFile(char* name){return -1;}
 //     return -1;
 // }
 
-int SysSeekFile(int position, OpenFileId id)
+int SysSeekFile(int pos, OpenFileId id)
 {
   OpenFile* opf = kernel->fileSystem->openf[id];
 
+  // Invalid file Id
   if(id < 0 || id >10)
   {
     return -1;
   }
 
+  // file is not opened
   if(opf == NULL)
   {
-    //SysPrintString("Seek fail \n");
     return -1;
-  }else{
-    if(position == -1)
-    {
-      position = kernel->fileSystem->openf[id]->Length()-1;
-    }
-
-    if(position > kernel->fileSystem->openf[id]->Length() || position < 0)
-    {
-      return -1;
-    }
-    else{
-      kernel->fileSystem->openf[id]->Seek(position);
-      return position;
-    }
   }
+
+  // Invalid position
+  if(pos > opf->Length() || pos < -1)
+  {
+    return -1;
+  }
+
+  // seek to end of file
+  if(pos == -1)
+  {
+    pos = opf->Length();
+    opf->Seek(pos);
+    return pos;
+  }
+
+  opf->Seek(pos);
+  return pos;
 }
 
+/*
+Nguyen Anh Tuan - 20120395
+Input:
+	@id: open file id
+Output:
+  TRUE   if file is open
+  FALSE  if file is open
+*/
 bool isOpen(OpenFileId id) {
+  // use id to check open file store in open file table
   OpenFile* opf = kernel->fileSystem->openf[id];
+
+  // not found open file
   if (opf == NULL) {
     return FALSE;
   }
+
+  // found open file
   return TRUE;
 }
 
-
+/*
+Nguyen Anh Tuan - 20120395
+Input:
+	@str string
+Output:
+  @len length of string
+Purpose:
+  to write the string of characters to the file according to the correct sizes.
+*/
 int StringLength(char str[]) {
   int len = 0;
   char c;
